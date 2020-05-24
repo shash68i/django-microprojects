@@ -1,17 +1,15 @@
 {% extends 'base.html' %} {% block javascript %}
 <script>
   $('#id_username').keyup(function () {
-    var username = $(this).val();
+    var form = $(this).closest("form");
     var msg = document.getElementById('message');
     $.ajax({
-      url: '/ajax/validate_username/',
-      data: {
-        username: username,
-      },
+      url: form.attr("data-validate-username-url"),
+      data: form.serialize(),
       dataType: 'json',
       success: function (data) {
         if (data.is_taken) {
-          msg.innerHTML = 'A user with this username already exists.';
+          msg.innerHTML = data.error_message;
         } else {
           msg.innerHTML = '';
         }
@@ -22,7 +20,7 @@
 {% endblock %} {% block content %}
 <div id="message"></div>
 
-<form method="post">
+<form method="post" data-validate-username-url="{% url 'validate_username' %}">
   {% csrf_token %} {{ form.as_p }}
   <button type="submit">Sign up</button>
 </form>
