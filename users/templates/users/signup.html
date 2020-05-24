@@ -1,17 +1,29 @@
-{% extends 'base.html' %}
-
-{% block javascript %}
-  <script>
-    $("#id_username").change(function () {
-      console.log( $(this).val() );
+{% extends 'base.html' %} {% block javascript %}
+<script>
+  $('#id_username').keyup(function () {
+    var username = $(this).val();
+    var msg = document.getElementById('message');
+    $.ajax({
+      url: '/ajax/validate_username/',
+      data: {
+        username: username,
+      },
+      dataType: 'json',
+      success: function (data) {
+        if (data.is_taken) {
+          msg.innerHTML = 'A user with this username already exists.';
+        } else {
+          msg.innerHTML = '';
+        }
+      },
     });
-  </script>
-{% endblock %}
+  });
+</script>
+{% endblock %} {% block content %}
+<div id="message"></div>
 
-{% block content %}
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign up</button>
-  </form>
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Sign up</button>
+</form>
 {% endblock %}
